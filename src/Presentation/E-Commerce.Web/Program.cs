@@ -1,6 +1,7 @@
 using E_Commerce.Domain.Contracts;
 using E_Commerce.Persistence.Data.Contexts;
 using E_Commerce.Persistence.Data.DataSeed;
+using E_Commerce.Persistence.Repositories;
 using E_Commerce.Web.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,6 +30,7 @@ namespace E_Commerce.Web
 
 
             builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
             var app = builder.Build();
