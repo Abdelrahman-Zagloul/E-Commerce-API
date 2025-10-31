@@ -2,6 +2,9 @@ using E_Commerce.Domain.Contracts;
 using E_Commerce.Persistence.Data.Contexts;
 using E_Commerce.Persistence.Data.DataSeed;
 using E_Commerce.Persistence.Repositories;
+using E_Commerce.Services;
+using E_Commerce.Services.Features;
+using E_Commerce.ServicesAbstraction;
 using E_Commerce.Web.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,6 +34,8 @@ namespace E_Commerce.Web
 
             builder.Services.AddScoped<IDbInitializer, DbInitializer>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddAutoMapper(typeof(IServicesAssemblyMarker).Assembly);
 
 
             var app = builder.Build();
