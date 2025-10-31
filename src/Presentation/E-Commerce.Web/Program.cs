@@ -1,12 +1,14 @@
-
+using E_Commerce.Domain.Contracts;
 using E_Commerce.Persistence.Data.Contexts;
+using E_Commerce.Persistence.Data.DataSeed;
+using E_Commerce.Web.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace E_Commerce.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +28,9 @@ namespace E_Commerce.Web
 
 
 
+            builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -35,11 +40,13 @@ namespace E_Commerce.Web
                 app.UseSwaggerUI();
             }
 
+
             app.UseHttpsRedirection();
-
+            await app.MigrateDataBase();
+            await app.SeedDataBase();
+            app.UseStaticFiles();
+            app.UseAuthentication();
             app.UseAuthorization();
-
-
             app.MapControllers();
 
             app.Run();
