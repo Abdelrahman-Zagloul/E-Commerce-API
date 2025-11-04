@@ -7,6 +7,7 @@ using E_Commerce.Services.Features;
 using E_Commerce.ServicesAbstraction;
 using E_Commerce.Web.Extensions;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 namespace E_Commerce.Web
 {
@@ -18,8 +19,11 @@ namespace E_Commerce.Web
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddControllers().AddJsonOptions(option =>
+            {
+                option.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
