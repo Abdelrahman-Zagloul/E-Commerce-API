@@ -1,4 +1,5 @@
 ﻿using E_Commerce.ServicesAbstraction;
+using E_Commerce.Shared.Parameters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace E_Commerce.Presentation.Controllers
@@ -16,9 +17,9 @@ namespace E_Commerce.Presentation.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllProducts()
+        public async Task<IActionResult> GetAllProducts([FromQuery] ProductQueryParams queryParams)
         {
-            var products = await _productService.GetAllProductsAsync();
+            var products = await _productService.GetAllProductsAsync(queryParams);
             return Ok(products);
         }
 
