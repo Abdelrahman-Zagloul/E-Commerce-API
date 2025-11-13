@@ -7,6 +7,7 @@ using E_Commerce.Services.Features;
 using E_Commerce.ServicesAbstraction;
 using E_Commerce.Web.Extensions;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 using System.Text.Json.Serialization;
 
 namespace E_Commerce.Web
@@ -35,10 +36,14 @@ namespace E_Commerce.Web
 
 
 
-
             builder.Services.AddScoped<IDbInitializer, DbInitializer>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddSingleton<IConnectionMultiplexer>(op =>
+            {
+                return ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")!);
+            });
+
             builder.Services.AddAutoMapper(typeof(IServicesAssemblyMarker).Assembly);
 
 
