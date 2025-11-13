@@ -41,10 +41,9 @@ namespace E_Commerce.Web
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<IBasketRepository, BasketRepository>();
             builder.Services.AddScoped<IBasketService, BasketService>();
-            builder.Services.AddSingleton<IConnectionMultiplexer>(op =>
-            {
-                return ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")!);
-            });
+            builder.Services.AddSingleton<IConnectionMultiplexer>(
+                op => ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")!)
+            );
 
             builder.Services.AddAutoMapper(typeof(IServicesAssemblyMarker).Assembly);
 
