@@ -41,6 +41,8 @@ namespace E_Commerce.Web
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<IBasketRepository, BasketRepository>();
             builder.Services.AddScoped<IBasketService, BasketService>();
+            builder.Services.AddScoped<ICasheRepository, CasheRepository>();
+            builder.Services.AddScoped<ICasheService, CasheService>();
             builder.Services.AddSingleton<IConnectionMultiplexer>(
                 op => ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")!)
             );
