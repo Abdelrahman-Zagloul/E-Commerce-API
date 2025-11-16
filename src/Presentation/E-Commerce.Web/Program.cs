@@ -6,6 +6,7 @@ using E_Commerce.Services;
 using E_Commerce.Services.Features;
 using E_Commerce.ServicesAbstraction;
 using E_Commerce.Web.Extensions;
+using E_Commerce.Web.Middlewares;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 using System.Text.Json.Serialization;
@@ -18,41 +19,10 @@ namespace E_Commerce.Web
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
-            builder.Services.AddControllers().AddJsonOptions(option =>
-            {
-                option.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            });
-
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
-
-            builder.Services.AddDbContext<StoreDbContext>(options =>
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("LocalConnection"));
-            });
-
-
-
-            builder.Services.AddScoped<IDbInitializer, DbInitializer>();
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-            builder.Services.AddScoped<IProductService, ProductService>();
-            builder.Services.AddScoped<IBasketRepository, BasketRepository>();
-            builder.Services.AddScoped<IBasketService, BasketService>();
-            builder.Services.AddScoped<ICasheRepository, CasheRepository>();
-            builder.Services.AddScoped<ICasheService, CasheService>();
-            builder.Services.AddSingleton<IConnectionMultiplexer>(
-                op => ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")!)
-            );
-
-            builder.Services.AddAutoMapper(typeof(IServicesAssemblyMarker).Assembly);
-
+            ApiServiceRegistration.AddApiServices(builder.Services, builder.Configuration);
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -60,6 +30,7 @@ namespace E_Commerce.Web
             }
 
 
+            app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
             app.UseHttpsRedirection();
             await app.MigrateDataBase();
             await app.SeedDataBase();
