@@ -27,8 +27,9 @@ namespace E_Commerce.Web
             await app.MigrateDataBaseAsync();
             await app.MigrateIdentityDataBaseAsync();
 
-
             await app.SeedDataBase();
+            await app.SeedIdentityDataBase();
+
             app.UseStaticFiles();
             app.UseAuthentication();
             app.UseAuthorization();
