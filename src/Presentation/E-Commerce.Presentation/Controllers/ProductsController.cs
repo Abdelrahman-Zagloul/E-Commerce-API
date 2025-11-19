@@ -1,13 +1,12 @@
 ﻿using E_Commerce.Presentation.Attributes;
 using E_Commerce.ServicesAbstraction;
+using E_Commerce.Shared.DTOs.Products;
 using E_Commerce.Shared.Parameters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace E_Commerce.Presentation.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductsController : ControllerBase
+    public class ProductsController : ApiBaseController
     {
 
         private readonly IProductService _productService;
@@ -44,8 +43,8 @@ namespace E_Commerce.Presentation.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductById(int id)
         {
-            var product = await _productService.GetProductByIdAsync(id);
-            return Ok(product);
+            var result = await _productService.GetProductByIdAsync(id);
+            return HandleResult<ProductDto>(result);
         }
     }
 }
