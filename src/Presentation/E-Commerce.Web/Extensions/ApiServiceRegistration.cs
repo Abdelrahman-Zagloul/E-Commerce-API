@@ -3,11 +3,13 @@ using E_Commerce.Domain.Entities.IdentityModule;
 using E_Commerce.Persistence.Data.Contexts;
 using E_Commerce.Persistence.Data.DataSeed;
 using E_Commerce.Persistence.IdentityData.Contexts;
+using E_Commerce.Persistence.IdentityData.DataSeed;
 using E_Commerce.Persistence.Repositories;
 using E_Commerce.Services;
 using E_Commerce.Services.Features;
 using E_Commerce.ServicesAbstraction;
 using E_Commerce.Web.Factories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
@@ -68,12 +70,14 @@ namespace E_Commerce.Web.Extensions
                 options.User.RequireUniqueEmail = true;
 
             })
-            .AddEntityFrameworkStores<StoreIdentityDbContext>();
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<StoreIdentityDbContext>();
 
         }
         private static void RegisterServices(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<IDbInitializer, DbInitializer>();
+            services.AddKeyedScoped<IDbInitializer, DbInitializer>("Default");
+            services.AddKeyedScoped<IDbInitializer, IdentityDbInitializer>("Identity");
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IBasketRepository, BasketRepository>();
