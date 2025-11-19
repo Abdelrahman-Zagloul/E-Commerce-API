@@ -1,10 +1,9 @@
 ﻿using E_Commerce.Services.Exceptions;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace E_Commerce.Web.Middlewares
 {
-    public class GlobalExceptionHandlerMiddleware 
+    public class GlobalExceptionHandlerMiddleware
 
     {
         private readonly RequestDelegate _next;
@@ -20,8 +19,8 @@ namespace E_Commerce.Web.Middlewares
             try
             {
                 await _next(context);
-                if (context.Response.StatusCode == StatusCodes.Status404NotFound)
-                    await HandleNotFoundResourece(context);
+                if (context.Response.StatusCode == StatusCodes.Status404NotFound && !context.Response.HasStarted)
+                    await HandleNotFoundResource(context);
             }
             catch (Exception ex)
             {
@@ -46,7 +45,7 @@ namespace E_Commerce.Web.Middlewares
             }
         }
 
-        private async Task HandleNotFoundResourece(HttpContext context)
+        private async Task HandleNotFoundResource(HttpContext context)
         {
             _logger.LogWarning("Resource not found: {Path}", context.Request.Path);
             var problemDetails = new ProblemDetails

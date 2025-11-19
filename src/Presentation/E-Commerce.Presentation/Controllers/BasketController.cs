@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace E_Commerce.Presentation.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class BasketController : ControllerBase
+    public class BasketController : ApiBaseController
     {
 
         private readonly IBasketService _basketService;
@@ -20,9 +18,7 @@ namespace E_Commerce.Presentation.Controllers
         public async Task<ActionResult<BasketDto>> GetBasket(string id)
         {
             var result = await _basketService.GetBasketAsync(id);
-            if (result is null)
-                return NotFound();
-            return Ok(result);
+            return HandleResult<BasketDto>(result);
         }
 
         [HttpPost]
@@ -36,8 +32,8 @@ namespace E_Commerce.Presentation.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBasket(string id)
         {
-            await _basketService.DeleteBasketAsync(id);
-            return NoContent();
+            var result = await _basketService.DeleteBasketAsync(id);
+            return HandleResult(result);
         }
     }
 }
