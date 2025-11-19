@@ -80,6 +80,7 @@ namespace E_Commerce.Web.Extensions
             services.AddKeyedScoped<IDbInitializer, IdentityDbInitializer>("Identity");
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IBasketRepository, BasketRepository>();
             services.AddScoped<IBasketService, BasketService>();
             services.AddScoped<ICasheRepository, CasheRepository>();

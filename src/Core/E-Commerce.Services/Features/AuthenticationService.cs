@@ -15,7 +15,7 @@ namespace E_Commerce.Services.Features
             _userManager = userManager;
         }
 
-        public async Task<Result<UserDto>> Login(LoginDto dto)
+        public async Task<Result<UserDto>> LoginAsync(LoginDto dto)
         {
             var user = await _userManager.FindByEmailAsync(dto.Email);
             if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
@@ -24,7 +24,7 @@ namespace E_Commerce.Services.Features
             var userDto = new UserDto(user.Email!, user.DisplayName, "Token");
             return Result<UserDto>.Ok(userDto);
         }
-        public async Task<Result<UserDto>> Register(RegisterDto dto)
+        public async Task<Result<UserDto>> RegisterAsync(RegisterDto dto)
         {
             var user = new ApplicationUser
             {
