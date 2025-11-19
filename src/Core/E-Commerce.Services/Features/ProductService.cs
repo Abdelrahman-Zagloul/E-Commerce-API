@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using E_Commerce.Domain.Contracts;
 using E_Commerce.Domain.Entities.ProductModule;
-using E_Commerce.Services.Exceptions;
 using E_Commerce.Services.Specifications.ProductSpecifications;
 using E_Commerce.ServicesAbstraction;
 using E_Commerce.Shared;
+using E_Commerce.Shared.CommonResult;
 using E_Commerce.Shared.DTOs.Products;
 using E_Commerce.Shared.Parameters;
 
@@ -47,14 +47,16 @@ namespace E_Commerce.Services.Features
             return _mapper.Map<IEnumerable<ProductTypeDto>>(products);
         }
 
-        public async Task<ProductDto> GetProductByIdAsync(int id)
+        public async Task<Result<ProductDto>> GetProductByIdAsync(int id)
         {
             var spec = new ProductWithBrandAndTypeSpecification(id);
             var products = await _unitOfWork.Repository<Product, int>().GetByIdAsync(spec);
             if (products == null)
-                throw new ProductNotFoundException(id);
+                return Error.NotFound(description: $"Product with Id: {id} Not Found"); //  implicit conversion to Result<ProductDto>.Fail
+            //return Result<ProductDto>.Fail(Error.NotFound(description: $"Product with Id: {id} Not Found"));
 
-            return _mapper.Map<ProductDto>(products);
+            return _mapper.Map<ProductDto>(products);// implicit conversion to Result<ProductDto>.Ok
+            //return Result<ProductDto>.Ok(_mapper.Map<ProductDto>(products));
         }
 
     }
