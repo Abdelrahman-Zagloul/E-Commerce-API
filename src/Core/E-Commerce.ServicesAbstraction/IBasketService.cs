@@ -1,11 +1,12 @@
-﻿using E_Commerce.Shared.DTOs.Baskets;
+﻿using E_Commerce.Shared.CommonResult;
+using E_Commerce.Shared.DTOs.Baskets;
 
 namespace E_Commerce.ServicesAbstraction
 {
     public interface IBasketService
     {
-        Task<BasketDto> GetBasketAsync(string id);
+        Task<Result<BasketDto>> GetBasketAsync(string id);
         Task<BasketDto> CreateOrUpdateBasketAsync(BasketDto basket);
-        Task<bool> DeleteBasketAsync(string id);
+        Task<Result> DeleteBasketAsync(string id);
     }
 }
