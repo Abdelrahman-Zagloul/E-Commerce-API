@@ -5,7 +5,7 @@ namespace E_Commerce.ServicesAbstraction
 {
     public interface IAuthenticationService
     {
-        Task<Result<UserDto>> Register(RegisterDto registerDto);
-        Task<Result<UserDto>> Login(LoginDto loginDto);
+        Task<Result<UserDto>> RegisterAsync(RegisterDto dto);
+        Task<Result<UserDto>> LoginAsync(LoginDto dto);
     }
 }
