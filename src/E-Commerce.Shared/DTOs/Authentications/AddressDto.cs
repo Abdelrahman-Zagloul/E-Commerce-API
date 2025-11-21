@@ -1,0 +1,15 @@
+﻿namespace E_Commerce.Shared.DTOs.Authentications
+{
+    public class AddressDto
+    {
+        public int Id { get; set; }
+        public string Street { get; set; } = string.Empty;
+        public string City { get; set; } = string.Empty;
+        public string Country { get; set; } = string.Empty;
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string UserId { get; set; } = string.Empty;
+
+
+    }
+}

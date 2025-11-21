@@ -3,6 +3,7 @@ using E_Commerce.ServicesAbstraction;
 using E_Commerce.Shared.CommonResult;
 using E_Commerce.Shared.DTOs.Authentications;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -20,6 +21,45 @@ namespace E_Commerce.Services.Features
         {
             _userManager = userManager;
             _configuration = configuration;
+        }
+
+        public async Task<Result<UserDto>> GetCurrentUserAsync(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return Result<UserDto>.Fail(Error.NotFound("User Not Found", "User not found."));
+
+            var userDto = new UserDto(user.Email!, user.DisplayName, await GenerateJwtToken(user));
+            return Result<UserDto>.Ok(userDto);
+        }
+
+        public async Task<Result<AddressDto>> GetUserAddressAsync(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return Result<AddressDto>.Fail(Error.NotFound("User Not Found", "User not found."));
+
+            var userAddressDto = await _userManager.Users.Select(
+                u => new AddressDto
+                {
+                    Id = u.Address.Id,
+                    Street = u.Address.Street,
+                    City = u.Address.City,
+                    Country = u.Address.Country,
+                    FirstName = u.Address.FirstName,
+                    LastName = u.Address.LastName,
+                    UserId = u.Id
+                }).FirstOrDefaultAsync(x => x.UserId == user.Id);
+
+            return Result<AddressDto>.Ok(userAddressDto!);
+        }
+
+        public async Task<bool> IsEmailExist(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return false;
+            return true;
         }
 
         public async Task<Result<UserDto>> LoginAsync(LoginDto dto)
@@ -48,6 +88,29 @@ namespace E_Commerce.Services.Features
             }
 
             return Result<UserDto>.Ok(new UserDto(user.Email!, user.DisplayName, await GenerateJwtToken(user)));
+        }
+
+        public async Task<Result> UpdateUserAddressAsync(string email, AddressDto addressDto)
+        {
+            var user = await _userManager.Users.Include(x => x.Address).FirstOrDefaultAsync(x => x.Email == email);
+            if (user == null)
+                return Result.Fail(Error.NotFound("User Not Found", "User not found."));
+
+            user.Address.Street = addressDto.Street;
+            user.Address.City = addressDto.City;
+            user.Address.Country = addressDto.Country;
+            user.Address.FirstName = addressDto.FirstName;
+            user.Address.LastName = addressDto.LastName;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => Error.Validation(e.Code, e.Description)).ToList();
+                return Result.Fail(errors);
+            }
+
+            return Result.Ok();
         }
 
         private async Task<string> GenerateJwtToken(ApplicationUser user)
