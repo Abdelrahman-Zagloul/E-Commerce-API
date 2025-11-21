@@ -9,10 +9,13 @@ using E_Commerce.Services;
 using E_Commerce.Services.Features;
 using E_Commerce.ServicesAbstraction;
 using E_Commerce.Web.Factories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
+using System.Text;
 using System.Text.Json.Serialization;
 namespace E_Commerce.Web.Extensions
 {
@@ -24,10 +27,32 @@ namespace E_Commerce.Web.Extensions
             AddDbContext(services, configuration);
             AddIdentityDbContext(services, configuration);
             RegisterServices(services, configuration);
-
+            ConfigureJwt(services, configuration);
 
             return services;
         }
+
+        private static void ConfigureJwt(IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuer = configuration["JWT:Issuer"],
+                    ValidAudience = configuration["JWT:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Key"]!)),
+                };
+            });
+        }
+
 
         private static void ConfigureControllerAndSwagger(IServiceCollection services)
         {
