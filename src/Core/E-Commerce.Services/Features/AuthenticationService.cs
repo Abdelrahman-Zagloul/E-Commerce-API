@@ -1,4 +1,5 @@
-﻿using E_Commerce.Domain.Entities.IdentityModule;
+﻿using AutoMapper;
+using E_Commerce.Domain.Entities.IdentityModule;
 using E_Commerce.ServicesAbstraction;
 using E_Commerce.Shared.CommonResult;
 using E_Commerce.Shared.DTOs.Authentications;
@@ -16,11 +17,12 @@ namespace E_Commerce.Services.Features
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
-
-        public AuthenticationService(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        private readonly IMapper _mapper;
+        public AuthenticationService(UserManager<ApplicationUser> userManager, IConfiguration configuration, IMapper mapper)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _mapper = mapper;
         }
 
         public async Task<Result<UserDto>> GetCurrentUserAsync(string email)
@@ -35,22 +37,16 @@ namespace E_Commerce.Services.Features
 
         public async Task<Result<AddressDto>> GetUserAddressAsync(string email)
         {
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.Users.Include(x => x.Address)
+                .FirstOrDefaultAsync(x => x.Email == email);
+
             if (user == null)
                 return Result<AddressDto>.Fail(Error.NotFound("User Not Found", "User not found."));
 
-            var userAddressDto = await _userManager.Users.Select(
-                u => new AddressDto
-                {
-                    Id = u.Address.Id,
-                    Street = u.Address.Street,
-                    City = u.Address.City,
-                    Country = u.Address.Country,
-                    FirstName = u.Address.FirstName,
-                    LastName = u.Address.LastName,
-                    UserId = u.Id
-                }).FirstOrDefaultAsync(x => x.UserId == user.Id);
+            if (user.Address == null)
+                return Result<AddressDto>.Fail(Error.NotFound(description: "User don't have address yet"));
 
+            var userAddressDto = _mapper.Map<AddressDto>(user.Address);
             return Result<AddressDto>.Ok(userAddressDto!);
         }
 
@@ -96,20 +92,16 @@ namespace E_Commerce.Services.Features
             if (user == null)
                 return Result.Fail(Error.NotFound("User Not Found", "User not found."));
 
-            user.Address.Street = addressDto.Street;
-            user.Address.City = addressDto.City;
-            user.Address.Country = addressDto.Country;
-            user.Address.FirstName = addressDto.FirstName;
-            user.Address.LastName = addressDto.LastName;
+
+            user.Address ??= new Address { UserId = user.Id };
+            _mapper.Map(addressDto, user.Address);
 
             var result = await _userManager.UpdateAsync(user);
-
             if (!result.Succeeded)
             {
                 var errors = result.Errors.Select(e => Error.Validation(e.Code, e.Description)).ToList();
                 return Result.Fail(errors);
             }
-
             return Result.Ok();
         }
 
