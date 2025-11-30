@@ -1,5 +1,6 @@
 ﻿using E_Commerce.Domain.Contracts;
 using E_Commerce.Domain.Entities;
+using E_Commerce.Domain.Entities.OrderModule;
 using E_Commerce.Domain.Entities.ProductModule;
 using E_Commerce.Persistence.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
@@ -24,8 +25,9 @@ namespace E_Commerce.Persistence.Data.DataSeed
             bool hasTypes = await _context.ProductTypes.AnyAsync();
             bool hasBrands = await _context.ProductBrands.AnyAsync();
             bool hasProducts = await _context.Products.AnyAsync();
+            bool hasDeliveryMethods = await _context.DeliveryMethods.AnyAsync();
 
-            if (hasTypes && hasBrands && hasProducts)
+            if (hasTypes && hasBrands && hasProducts && hasDeliveryMethods)
                 return;
 
             try
@@ -34,6 +36,9 @@ namespace E_Commerce.Persistence.Data.DataSeed
                     await SeedDataFromJsonAsync<ProductType, int>("types.json", _context.ProductTypes);
                 if (!hasBrands)
                     await SeedDataFromJsonAsync<ProductBrand, int>("brands.json", _context.ProductBrands);
+
+                if (!hasDeliveryMethods)
+                    await SeedDataFromJsonAsync<DeliveryMethod, int>("delivery.json", _context.DeliveryMethods);
 
                 await _context.SaveChangesAsync();
 
