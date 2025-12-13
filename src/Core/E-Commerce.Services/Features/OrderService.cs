@@ -32,6 +32,9 @@ namespace E_Commerce.Services.Features
             if (basket == null)
                 return Result<OrderDto>.Fail(Error.NotFound("Basket not found", $"Basket with id:{dto.BasketId} not found"));
 
+            if (basket.PaymentIntentId == null)
+                return Result<OrderDto>.Fail(Error.Validation("Payment Intent Id not found", $"Payment Intent Id can't be null"));
+
             Order order = await CreateOrder(email, dto, deliveryMethod, basket);
 
             await _unitOfWork.Repository<Order, Guid>().AddAsync(order);
@@ -64,15 +67,19 @@ namespace E_Commerce.Services.Features
                 };
                 orderItems.Add(orderItem);
             }
+
             var subtotal = orderItems.Sum(item => item.Price * item.Quantity);
             var order = new Order
             {
+
                 UserEmail = email,
+                PaymentIntentId = basket.PaymentIntentId!,
                 ShippingAddress = _mapper.Map<OrderAddress>(dto.ShippingAddress),
                 DeliveryMethodId = deliveryMethod.Id,
                 DeliveryMethod = deliveryMethod,
                 SubTotal = subtotal,
                 Items = orderItems,
+
             };
             return order;
         }
