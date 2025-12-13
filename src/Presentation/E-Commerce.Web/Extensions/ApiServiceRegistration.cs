@@ -111,6 +111,7 @@ namespace E_Commerce.Web.Extensions
             services.AddScoped<ICasheRepository, CasheRepository>();
             services.AddScoped<ICasheService, CasheService>();
             services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IPaymentService, PaymentService>();
             services.AddSingleton<IConnectionMultiplexer>(
                 op => ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection")!)
             );

@@ -24,8 +24,6 @@ namespace E_Commerce.Services.Features
             _mapper = mapper;
             _configuration = configuration;
         }
-
-
         public async Task<Result<BasketDto>> CreateOrUpdatePaymentIntent(string basketId)
         {
             //get basket from repository
@@ -51,6 +49,8 @@ namespace E_Commerce.Services.Features
                     return Error.NotFound($"Product with id {item.Id} Not Found");
 
                 item.Price = product.Price;
+                item.Name = product.Name;
+                item.PictureUrl = product.PictureUrl;
             }
             long totalPriceInCent = (long)(basket.Items.Sum(i => i.Quantity * i.Price) + basket.ShippingPrice) * 100;
 
@@ -89,6 +89,8 @@ namespace E_Commerce.Services.Features
             }
 
 
+            //save changes to repository
+            await _basketRepository.CreateOrUpdateBasketAsync(basket, TimeSpan.FromDays(7));
             return _mapper.Map<BasketDto>(basket);
         }
     }
