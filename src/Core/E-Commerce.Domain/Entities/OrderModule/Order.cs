@@ -8,8 +8,7 @@
         public OrderAddress ShippingAddress { get; set; } = default!; // Owned Entity
         public decimal SubTotal { get; set; }
         public decimal GetTotal() => SubTotal + DeliveryMethod.Cost;
-
-
+        public string PaymentIntentId { get; set; } = default!;
         public int DeliveryMethodId { get; set; }
         public DeliveryMethod DeliveryMethod { get; set; } = default!;
         public ICollection<OrderItem> Items { get; set; } = [];
