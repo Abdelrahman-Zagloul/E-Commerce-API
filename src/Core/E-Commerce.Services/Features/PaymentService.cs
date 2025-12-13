@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using E_Commerce.Domain.Contracts;
 using E_Commerce.Domain.Entities.OrderModule;
+using E_Commerce.Services.Specifications.OrderSpecifications;
 using E_Commerce.ServicesAbstraction;
 using E_Commerce.Shared.CommonResult;
 using E_Commerce.Shared.DTOs.Baskets;
@@ -92,6 +93,39 @@ namespace E_Commerce.Services.Features
             //save changes to repository
             await _basketRepository.CreateOrUpdateBasketAsync(basket, TimeSpan.FromDays(7));
             return _mapper.Map<BasketDto>(basket);
+        }
+
+        public async Task UpdateOrderStatus(string json, string signatureHeader)
+        {
+            try
+            {
+                string endpointSecret = _configuration["Stripe:EndpointSecret"]!;
+                var stripeEvent = EventUtility.ConstructEvent(json, signatureHeader, endpointSecret);
+
+                var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
+                if (paymentIntent == null)
+                    return;
+
+                if (stripeEvent.Type == EventTypes.PaymentIntentSucceeded)
+                    await UpdateOrderPaymentStatus(paymentIntent.Id, OrderStatus.PaymentReceived);
+                else
+                    await UpdateOrderPaymentStatus(paymentIntent.Id, OrderStatus.PaymentFailed);
+            }
+            catch (StripeException ex)
+            {
+                return;
+            }
+        }
+        private async Task UpdateOrderPaymentStatus(string paymentIntentId, OrderStatus orderStatus)
+        {
+            var spec = new OrderPaymentSpecification(paymentIntentId);
+            var order = await _unitOfWork.Repository<Order, Guid>().GetByIdAsync(spec);
+
+            if (order == null)
+                return;
+
+            order.status = orderStatus;
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }
