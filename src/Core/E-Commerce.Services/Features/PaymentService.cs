@@ -62,7 +62,7 @@ namespace E_Commerce.Services.Features
                 var service = new PaymentIntentService();
 
                 // create payment intent    
-                if (basket.PaymentIntendId == null)
+                if (basket.PaymentIntentId == null)
                 {
                     var paymentResult = await service.CreateAsync(new PaymentIntentCreateOptions
                     {
@@ -71,13 +71,13 @@ namespace E_Commerce.Services.Features
                         PaymentMethodTypes = ["card"]
                     });
 
-                    basket.PaymentIntendId = paymentResult.Id;
+                    basket.PaymentIntentId = paymentResult.Id;
                     basket.ClientSecret = paymentResult.ClientSecret;
 
                 }
                 else
                 {
-                    await service.UpdateAsync(basket.PaymentIntendId, new PaymentIntentUpdateOptions
+                    await service.UpdateAsync(basket.PaymentIntentId, new PaymentIntentUpdateOptions
                     {
                         Amount = totalPriceInCent,
                     });
