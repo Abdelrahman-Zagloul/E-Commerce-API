@@ -45,6 +45,9 @@ ScaffoldingReadMe.txt
 # Rider IDE
 .idea/
 
+*.json
+
+
 # Generated files
 Generated\ Files/
 

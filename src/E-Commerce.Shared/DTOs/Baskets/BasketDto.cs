@@ -5,6 +5,7 @@
         ICollection<BasketItemDto> Items,
         string? PaymentIntentId,
         string? ClientSecret,
+        int? DeliveryMethodId,
         decimal ShippingPrice
     );
 }
