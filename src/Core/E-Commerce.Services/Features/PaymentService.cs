@@ -108,7 +108,7 @@ namespace E_Commerce.Services.Features
 
                 if (stripeEvent.Type == EventTypes.PaymentIntentSucceeded)
                     await UpdateOrderPaymentStatus(paymentIntent.Id, OrderStatus.PaymentReceived);
-                else
+                else if (stripeEvent.Type == EventTypes.PaymentIntentPaymentFailed)
                     await UpdateOrderPaymentStatus(paymentIntent.Id, OrderStatus.PaymentFailed);
             }
             catch (StripeException ex)

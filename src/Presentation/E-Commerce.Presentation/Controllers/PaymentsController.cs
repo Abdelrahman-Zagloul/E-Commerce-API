@@ -1,4 +1,5 @@
 ﻿using E_Commerce.ServicesAbstraction;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace E_Commerce.Presentation.Controllers
@@ -13,6 +14,7 @@ namespace E_Commerce.Presentation.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> CreateOrUpdatePaymentIntent(string basketId)
         {
             var result = await _paymentService.CreateOrUpdatePaymentIntent(basketId);

@@ -1,5 +1,6 @@
 using E_Commerce.Web.Extensions;
 using E_Commerce.Web.Middlewares;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace E_Commerce.Web
 {
@@ -16,7 +17,12 @@ namespace E_Commerce.Web
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(options =>
+                {
+                    options.DisplayRequestDuration();
+                    options.EnableFilter();
+                    options.DocExpansion(DocExpansion.None);
+                });
             }
 
 
